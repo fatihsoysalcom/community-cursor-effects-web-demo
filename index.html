@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Cursor Demo</title>
+    <style>
+        /* Custom cursor for the entire page */
+        body {
+            /* Uses a base64 encoded SVG for a custom pointer cursor */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-pointer"><path d="M3 3l7.07 19 2.51-7.39L19 12.07 3 3z"></path></svg>') 0 0, auto;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            overflow: hidden; /* Hide default scrollbars if any */
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        .interactive-area {
+            width: 300px;
+            height: 100px;
+            background-color: #4CAF50;
+            margin: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2em;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: background-color 0.3s ease;
+            /* Custom cursor for this specific element, changes on hover */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-hand"><path d="M2 12s2.5 0 5 0 5 0 5 0 2.5 0 5 0 5 0 5 0"></path><path d="M12 2s0 2.5 0 5 0 5 0 5 0 2.5 0 5 0 5 0 5 0"></path></svg>') 12 12, grab;
+        }
+
+        .interactive-area:hover {
+            background-color: #45a049;
+        }
+
+        .another-area {
+            width: 300px;
+            height: 100px;
+            background-color: #008CBA;
+            margin: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2em;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: background-color 0.3s ease;
+            /* Another custom cursor for a different interactive element */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-target"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>') 12 12, crosshair;
+        }
+
+        .another-area:hover {
+            background-color: #007bb5;
+        }
+
+        /* Styles for the "community" cursors, simulating multiple users */
+        .community-cursor {
+            position: fixed;
+            width: 16px;
+            height: 16px;
+            background-color: rgba(255, 99, 71, 0.7); /* Tomato color */
+            border-radius: 50%;
+            pointer-events: none; /* Make sure they don't interfere with mouse events */
+            transform: translate(-50%, -50%); /* Center the cursor on its coordinates */
+            transition: transform 0.1s ease-out; /* Smooth movement */
+            z-index: 9999; /* Ensure they are on top */
+            opacity: 0.8;
+            border: 1px solid rgba(255, 99, 71, 1);
+        }
+
+        /* Different colors for community cursors to distinguish them */
+        .community-cursor:nth-child(2) { background-color: rgba(60, 179, 113, 0.7); border-color: rgba(60, 179, 113, 1); } /* Medium Sea Green */
+        .community-cursor:nth-child(3) { background-color: rgba(70, 130, 180, 0.7); border-color: rgba(70, 130, 180, 1); } /* Steel Blue */
+        .community-cursor:nth-child(4) { background-color: rgba(255, 165, 0, 0.7); border-color: rgba(255, 165, 0, 1); } /* Orange */
+
+    </style>
+</head>
+<body>
+    <h1>Topluluk İmleç Deneyimi</h1>
+
+    <div class="interactive-area">
+        Hover for a Hand Cursor
+    </div>
+
+    <div class="another-area">
+        Hover for a Target Cursor
+    </div>
+
+    <script>
+        // Number of "community" cursors to simulate
+        const NUM_COMMUNITY_CURSORS = 3;
+        const communityCursors = [];
+        let mouseX = 0;
+        let mouseY = 0;
+
+        // Create community cursor elements and append them to the body
+        for (let i = 0; i < NUM_COMMUNITY_CURSORS; i++) {
+            const cursor = document.createElement('div');
+            cursor.classList.add('community-cursor');
+            document.body.appendChild(cursor);
+            communityCursors.push({
+                element: cursor,
+                x: 0,
+                y: 0,
+                targetX: 0,
+                targetY: 0
+            });
+        }
+
+        // Update main mouse position on move
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // Animation loop for community cursors to follow the main cursor
+        function animateCommunityCursors() {
+            // The first community cursor follows the main mouse directly
+            if (communityCursors.length > 0) {
+                communityCursors[0].targetX = mouseX;
+                communityCursors[0].targetY = mouseY;
+            }
+
+            // Subsequent community cursors follow the previous one, creating a trail effect
+            for (let i = 1; i < NUM_COMMUNITY_CURSORS; i++) {
+                communityCursors[i].targetX = communityCursors[i-1].x;
+                communityCursors[i].targetY = communityCursors[i-1].y;
+            }
+
+            // Update positions with a slight delay/easing for smooth tracking
+            communityCursors.forEach((cursorData, index) => {
+                // Smoothly move towards the target with a factor that makes later cursors slightly slower
+                cursorData.x += (cursorData.targetX - cursorData.x) * (0.1 + index * 0.05);
+                cursorData.y += (cursorData.targetY - cursorData.y) * (0.1 + index * 0.05);
+
+                cursorData.element.style.left = `${cursorData.x}px`;
+                cursorData.element.style.top = `${cursorData.y}px`;
+            });
+
+            requestAnimationFrame(animateCommunityCursors);
+        }
+
+        // Start the animation
+        animateCommunityCursors();
+    </script>
+</body>
+</html>
